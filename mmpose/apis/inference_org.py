@@ -409,21 +409,6 @@ def inference_bottom_up_pose_model(model,
     test_pipeline = Compose(test_pipeline)
 
     # prepare data
-    # org for coco
-    # data = {
-    #     'img_or_path': img_or_path,
-    #     'dataset': 'coco',
-    #     'ann_info': {
-    #         'image_size':
-    #         cfg.data_cfg['image_size'],
-    #         'num_joints':
-    #         cfg.data_cfg['num_joints'],
-    #         'flip_index':
-    #         [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15],
-    #     }
-    # }
-
-    # need to tune flip_index for posetrack
     data = {
         'img_or_path': img_or_path,
         'dataset': 'coco',
@@ -433,7 +418,7 @@ def inference_bottom_up_pose_model(model,
             'num_joints':
             cfg.data_cfg['num_joints'],
             'flip_index':
-            [0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15],
+            [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15],
         }
     }
 
@@ -509,26 +494,6 @@ def vis_pose_result(model,
 
         pose_limb_color = palette[[
             0, 0, 0, 0, 7, 7, 7, 9, 9, 9, 9, 9, 16, 16, 16, 16, 16, 16, 16
-        ]]
-        pose_kpt_color = palette[[
-            16, 16, 16, 16, 16, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0
-        ]]
-
-
-    elif dataset == 'BottomUpPoseTrack18Dataset':
-
-        skeleton = [[16, 14], [14, 12], [17, 15], [15, 13],
-                    [12, 13], [6, 12], [7, 13],
-                    [6, 2], [2, 7],
-                    [6, 8], [8, 10], [7, 9], [9, 11],
-                    [1, 2], [1, 3], [1, 4], [1, 5]]
-
-        pose_limb_color = palette[[
-            0, 0, 0, 0,
-            7, 7, 7,
-            9, 9,
-            9, 9, 9, 9,
-            16, 16, 16, 16
         ]]
         pose_kpt_color = palette[[
             16, 16, 16, 16, 16, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0

@@ -11,6 +11,7 @@ from mmpose.apis import single_gpu_test
 from mmpose.apis import init_pose_model
 from mmpose.apis import inference_bottom_up_pose_model
 from mmpose.apis import vis_pose_result
+from mmpose.apis import vis_pose_result_no_limb
 
 def parse_args():
     parser = argparse.ArgumentParser(description='test for visualization')
@@ -21,7 +22,9 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def main():
+
     args = parse_args()
 
     model = init_pose_model(args.config, args.checkpoint, device='cuda:0')
@@ -49,7 +52,7 @@ def main():
             outputs=None
         )
 
-        img_vis = vis_pose_result(
+        img_vis = vis_pose_result_no_limb(
             model=model,
             img=img_input,
             result=pose_results,

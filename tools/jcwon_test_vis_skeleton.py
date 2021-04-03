@@ -26,6 +26,12 @@ def main():
 
     model = init_pose_model(args.config, args.checkpoint, device='cuda:0')
 
+    if not os.path.exists(args.output_dir):
+        os.mkdir(args.output_dir)
+    args.output_dir += 'vis/'
+    if not os.path.exists(args.output_dir):
+        os.mkdir(args.output_dir)
+
     # load test images
     listImages = glob.glob(os.path.normpath("%s/*/*.jpg"%(args.input_dir)))
     listImages.sort()
@@ -53,9 +59,6 @@ def main():
             out_file=None)
 
         # path to save results
-        if not os.path.exists(args.output_dir):
-            os.mkdir(args.output_dir)
-
         path_out_dir, path_out_filename = os.path.split(path_image[len(args.input_dir):])
         path_out_dir = os.path.join(args.output_dir, path_out_dir)
         if not os.path.exists(path_out_dir):
@@ -63,7 +66,7 @@ def main():
 
         cv2.imwrite(os.path.join(path_out_dir, path_out_filename), img_vis)
 
-        if i % (lenImages/10) == 0:
+        if i % (lenImages/5) == 0:
             print('[%5d/%5d] Visualizing keypoints and heatmaps...'%(i, lenImages))
 
 

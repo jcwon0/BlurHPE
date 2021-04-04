@@ -77,13 +77,13 @@ def main():
         cv2.imwrite(os.path.join(path_out_dir, path_out_filename), img_vis)
 
         for k in range(17):
-            path_overlaid = '%s/%s_%s.jpg'%(path_out_dir, path_out_filename[:-4], name_kpts[k])
 
             heatmap = cv2.resize(returned_outputs[0]['heatmap'][0][k], dsize=(img_input.shape[1], img_input.shape[0]), interpolation=cv2.INTER_LINEAR)
             heatmap[heatmap<0]=0
             heatmap = cv2.cvtColor((heatmap*255).astype(np.uint8),cv2.COLOR_GRAY2RGB)
-
             image_overlaid = cv2.addWeighted(heatmap, 0.5, img_input, 0.5, 0)
+
+            path_overlaid = '%s/%s_%s.jpg'%(path_out_dir, path_out_filename[:-4], name_kpts[k])
             cv2.imwrite(path_overlaid, image_overlaid)
 
         if i % (lenImages/5) == 0:

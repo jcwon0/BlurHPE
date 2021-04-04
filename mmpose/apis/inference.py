@@ -178,6 +178,10 @@ def _inference_single_pose_model(model,
     if dataset in ('TopDownCocoDataset', 'TopDownOCHumanDataset'):
         flip_pairs = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12],
                       [13, 14], [15, 16]]
+
+    elif dataset == 'TopDownPoseTrack18dataset':
+        flip_pairs = [[3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16]]
+
     elif dataset == 'TopDownCocoWholeBodyDataset':
         body = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14],
                 [15, 16]]
@@ -515,7 +519,7 @@ def vis_pose_result(model,
         ]]
 
 
-    elif dataset == 'BottomUpPoseTrack18Dataset':
+    elif dataset in ('BottomUpPoseTrack18Dataset', 'TopDownPoseTrack18dataset'):
 
         skeleton = [[16, 14], [14, 12], [17, 15], [15, 13],
                     [12, 13], [6, 12], [7, 13],

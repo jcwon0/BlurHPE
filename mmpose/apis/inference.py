@@ -727,3 +727,59 @@ def vis_pose_result_no_limb(model,
         out_file=out_file)
 
     return img
+
+def vis_pose_result_no_bbox(model,
+                            img,
+                            result,
+                            kpt_score_thr=0.3,
+                            dataset='TopDownPoseTrack18dataset',
+                            show=False,
+                            out_file=None):
+
+    if hasattr(model, 'module'):
+        model = model.module
+
+    palette = np.array([[255, 128, 0], [255, 153, 51], [255, 178, 102],
+                        [230, 230, 0], [255, 153, 255], [153, 204, 255],
+                        [255, 102, 255], [255, 51, 255], [102, 178, 255],
+                        [51, 153, 255], [255, 153, 153], [255, 102, 102],
+                        [255, 51, 51], [153, 255, 153], [102, 255, 102],
+                        [51, 255, 51], [0, 255, 0], [0, 0, 255], [255, 0, 0],
+                        [255, 255, 255]])
+
+    radius = 4
+
+    if dataset == 'TopDownPoseTrack18dataset':
+
+        skeleton = [[16, 14], [14, 12], [17, 15], [15, 13],
+                    [12, 13], [6, 12], [7, 13],
+                    [6, 2], [2, 7],
+                    [6, 8], [8, 10], [7, 9], [9, 11],
+                    [1, 2], [1, 3], [1, 4], [1, 5]]
+
+        pose_limb_color = palette[[
+            0, 0, 0, 0,
+            7, 7, 7,
+            9, 9,
+            9, 9, 9, 9,
+            16, 16, 16, 16
+        ]]
+        pose_kpt_color = palette[[
+            16, 16, 16, 16, 16, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0
+        ]]
+
+    else:
+        raise NotImplementedError()
+
+    img = model.show_result_no_bbox(
+        img,
+        result,
+        skeleton,
+        radius=radius,
+        pose_kpt_color=pose_kpt_color,
+        pose_limb_color=pose_limb_color,
+        kpt_score_thr=kpt_score_thr,
+        show=show,
+        out_file=out_file)
+
+    return img

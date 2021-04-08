@@ -104,7 +104,7 @@ def main():
                 show=False)
 
         # path to save results
-        path_out_dir, path_out_filename = os.path.split(path_image[len(args.input_dir):])
+        path_out_dir, path_out_filename = os.path.split(path_image[len(args.input_dir)-1:])
         path_out_dir = os.path.join(args.output_dir, path_out_dir)
         if not os.path.exists(path_out_dir):
             os.mkdir(path_out_dir)

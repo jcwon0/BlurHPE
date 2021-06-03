@@ -1,16 +1,32 @@
 log_level = 'INFO'
-
+load_from = None
+resume_from = None
 dist_params = dict(backend='nccl')
+workflow = [('train', 1)]
+checkpoint_config = dict(interval=300)
+evaluation = dict(interval=300, metric='mAP', key_indicator='AP')
 
+optimizer = dict(
+    type='Adam',
+    lr=0.0015,
+)
+optimizer_config = dict(grad_clip=None)
+# learning policy
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[200, 260])
+total_epochs = 300
 log_config = dict(
-    interval=250,
+    interval=100,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
     ])
 
 channel_cfg = dict(
-    num_output_channels=17,
     dataset_joints=17,
     dataset_channel=[
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
@@ -19,12 +35,11 @@ channel_cfg = dict(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
     ])
 
-
 data_cfg = dict(
-    image_size=512,
-    base_size=256,
+    image_size=640,
+    base_size=320,
     base_sigma=2,
-    heatmap_size=[128, 256],
+    heatmap_size=[160, 320],
     num_joints=channel_cfg['dataset_joints'],
     dataset_channel=channel_cfg['dataset_channel'],
     inference_channel=channel_cfg['inference_channel'],
@@ -35,7 +50,8 @@ data_cfg = dict(
 # model settings
 model = dict(
     type='BottomUp',
-    pretrained=None,
+    pretrained='https://download.openmmlab.com/mmpose/'
+    'pretrain_models/hrnet_w32-36af842e.pth',
     backbone=dict(
         type='HRNet',
         in_channels=3,
@@ -51,28 +67,28 @@ model = dict(
                 num_branches=2,
                 block='BASIC',
                 num_blocks=(4, 4),
-                num_channels=(48, 96)),
+                num_channels=(32, 64)),
             stage3=dict(
                 num_modules=4,
                 num_branches=3,
                 block='BASIC',
                 num_blocks=(4, 4, 4),
-                num_channels=(48, 96, 192)),
+                num_channels=(32, 64, 128)),
             stage4=dict(
                 num_modules=3,
                 num_branches=4,
                 block='BASIC',
                 num_blocks=(4, 4, 4, 4),
-                num_channels=(48, 96, 192, 384))),
+                num_channels=(32, 64, 128, 256))),
     ),
     keypoint_head=dict(
         type='BottomUpHigherResolutionHead',
-        in_channels=48,
+        in_channels=32,
         num_joints=17,
         tag_per_joint=True,
         extra=dict(final_conv_kernel=1, ),
         num_deconv_layers=1,
-        num_deconv_filters=[48],
+        num_deconv_filters=[32],
         num_deconv_kernels=[4],
         num_basic_blocks=4,
         cat_output=[True],
@@ -83,7 +99,7 @@ model = dict(
             num_stages=2,
             ae_loss_type='exp',
             with_ae_loss=[True, False],
-            push_loss_factor=[0.001, 0.001],
+            push_loss_factor=[0.002, 0.002],
             pull_loss_factor=[0.001, 0.001],
             with_heatmaps_loss=[True, True],
             heatmaps_loss_factor=[1.0, 1.0])),
@@ -106,7 +122,32 @@ model = dict(
         ignore_too_much=False,
         adjust=True,
         refine=True,
-        flip_test=False))
+        flip_test=True))
+
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='BottomUpRandomAffine',
+        rot_factor=30,
+        scale_factor=[0.75, 1.5],
+        scale_type='short',
+        trans_factor=40),
+    dict(type='BottomUpRandomFlip', flip_prob=0.5),
+    dict(type='ToTensor'),
+    dict(
+        type='NormalizeTensor',
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]),
+    dict(
+        type='BottomUpGenerateTarget',
+        sigma=2,
+        max_num_people=30,
+    ),
+    dict(
+        type='Collect',
+        keys=['img', 'joints', 'targets', 'masks'],
+        meta_keys=[]),
+]
 
 val_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -130,3 +171,38 @@ val_pipeline = [
 ]
 
 test_pipeline = val_pipeline
+
+data_root = '/data/project/rw/posetrack18/posetrack18'
+# for eval
+# data_root = '/data/project/rw/posetrack18/blur1'
+# data_root = '/data/project/rw/posetrack18/blur2'
+# data_root = '/data/project/rw/posetrack18/blur3'
+# data_root = '/data/project/rw/posetrack18/blur4'
+
+data = dict(
+    samples_per_gpu=24,
+    workers_per_gpu=13,
+    train=dict(
+        type='BottomUpPoseTrack18Dataset',
+        ann_file=f'{data_root}/annotations/posetrack18_train.json',
+        # for train
+        # ann_file=f'{data_root}/annotations/posetrack18_train_blur1.json',
+        # ann_file=f'{data_root}/annotations/posetrack18_train_blur2.json',
+        # ann_file=f'{data_root}/annotations/posetrack18_train_blur3.json',
+        # ann_file=f'{data_root}/annotations/posetrack18_train_blur4.json',
+        img_prefix=f'{data_root}/',
+        data_cfg=data_cfg,
+        pipeline=train_pipeline),
+    val=dict(
+        type='BottomUpPoseTrack18Dataset',
+        ann_file=f'{data_root}/annotations/posetrack18_val.json',
+        img_prefix=f'{data_root}/',
+        data_cfg=data_cfg,
+        pipeline=val_pipeline),
+    test=dict(
+        type='BottomUpPoseTrack18Dataset',
+        ann_file=f'{data_root}/annotations/posetrack18_val.json',
+        img_prefix=f'{data_root}/',
+        data_cfg=data_cfg,
+        pipeline=val_pipeline),
+)

@@ -3,6 +3,8 @@ from collections import OrderedDict, defaultdict
 
 import json_tricks as json
 import numpy as np
+from poseval import eval_helpers
+from poseval.evaluateAP import evaluateAP
 import xtcocotools
 from xtcocotools.coco import COCO
 from xtcocotools.cocoeval import COCOeval
@@ -65,6 +67,9 @@ class BottomUpPoseTrack18Dataset(BottomUpBaseDataset):
         self.ann_info['flip_index'] = [
             0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15
         ]
+        # self.ann_info['flip_index'] = [
+        #     0, 1, 2, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13
+        # ]
 
         self.ann_info['use_different_joint_weights'] = False
         self.ann_info['joint_weights'] = np.array(
@@ -72,12 +77,23 @@ class BottomUpPoseTrack18Dataset(BottomUpBaseDataset):
                 1., 1., 1., 1., 1., 1., 1., 1.2, 1.2, 1.5, 1.5, 1., 1., 1.2,
                 1.2, 1.5, 1.5
             ],
-            dtype=np.float32).reshape((self.ann_info['num_joints'], 1))
+            dtype=np.float32).reshape((17, 1))
+
+        # self.ann_info['joint_weights'] = np.array(
+        #     [
+        #         1., 1., 1., 1., 1., 1.2, 1.2, 1.5, 1.5, 1., 1., 1.2,
+        #         1.2, 1.5, 1.5
+        #     ],
+        #     dtype=np.float32).reshape((self.ann_info['num_joints'], 1))
 
         self.sigmas = np.array([
             .26, .25, .25, .35, .35, .79, .79, .72, .72, .62, .62, 1.07, 1.07,
             .87, .87, .89, .89
         ]) / 10.0
+        # self.sigmas = np.array([
+        #     .26, .25, .25, .79, .79, .72, .72, .62, .62, 1.07, 1.07,
+        #     .87, .87, .89, .89
+        # ]) / 9.3
 
         self.coco = COCO(ann_file)
 

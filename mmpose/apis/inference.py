@@ -521,22 +521,28 @@ def vis_pose_result(model,
 
     elif dataset in ('BottomUpPoseTrack18Dataset', 'TopDownPoseTrack18dataset'):
 
-        skeleton = [[16, 14], [14, 12], [17, 15], [15, 13],
-                    [12, 13], [6, 12], [7, 13],
-                    [6, 2], [2, 7],
-                    [6, 8], [8, 10], [7, 9], [9, 11],
-                    [1, 2], [1, 3], [1, 4], [1, 5]]
-
-        pose_limb_color = palette[[
-            0, 0, 0, 0,
-            7, 7, 7,
-            9, 9,
-            9, 9, 9, 9,
-            16, 16, 16, 16
-        ]]
-        pose_kpt_color = palette[[
-            16, 16, 16, 16, 16, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0
-        ]]
+        print("="*50)
+        print("="*50)
+        print("="*50)
+        print("Check apis/inference.py")
+        print("Search BottomUpPoseTrack18")
+        print("="*50)
+        print("="*50)
+        print("="*50)
+        # skeleton = [[16, 14], [14, 12], [17, 15], [15, 13], [12, 13],
+        #                    [6, 12], [7, 13], [6, 7], [6, 8], [7, 9], [8, 10], [9, 11],
+        #                     [2, 3], [1, 2], [1, 3]]
+        #
+        # pose_limb_color = palette[[
+        #     0, 0, 0, 0, 0
+        #     9, 9, 9, 9, 9, 9, 9,
+        #     16, 16, 16
+        # ]]
+        #
+        # BottomUpPoseTrack18, config - 17-->15, index 3, 4
+        # pose_kpt_color = palette[[
+        #     16, 16, 16, 16, 16, 9, 9, 9, 9, 9, 9, 0, 0, 0, 0, 0, 0
+        # ]]
 
     elif dataset == 'TopDownCocoWholeBodyDataset':
         # show the results
